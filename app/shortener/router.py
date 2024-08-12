@@ -5,7 +5,9 @@ from app.shortener.database import get_db
 from app.shortener.schema import URLInfo, URLCreate, URLRedirect
 from app.shortener.service import UrlService
 from typing import List
+from app.core.config import get_settings
 from app.shortener.exceptions import NotFoundException
+from app.shortener.cache import get_or_create_short_url, get_original_url
 router = APIRouter()
 service = UrlService()
 
@@ -28,15 +30,15 @@ def get_url_detail(url_id=int, db: Session = Depends(get_db)):
 
 @router.post("/urls/",  status_code=201)
 def create_url(url: URLCreate, db: Session = Depends(get_db)):
-    url = service.create_url(db=db, url=url)
-
-    return {"short_url": url}
+    url = get_or_create_short_url(url, db,  service.create_url)
+    BASE_URL = get_settings().BASE_URL
+    return {"short_url": f"{BASE_URL}/{url}/"}
 
 
 @router.get("/{short_url}/", response_model=URLRedirect)
 def get_redirect_url(short_url: str, db: Session = Depends(get_db)):
-    redirect_url = service.get_redirect_url(db, short_url=short_url)
+    redirect_url = get_original_url(short_url, db, service.get_redirect_url)
     if not redirect_url:
         raise NotFoundException(short_url)
 
-    return RedirectResponse(redirect_url.get('original_url'))
+    return RedirectResponse(redirect_url)

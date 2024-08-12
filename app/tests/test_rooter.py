@@ -69,31 +69,30 @@ class TestRooter:
         assert isinstance(data, list)
         assert len(data) > 0
 
-    @patch("app.shortener.service.get_settings")
+    @patch("app.core.config.get_settings")
     def test_create_url(self, mock_get_settings, db_session, client):
-        mock_get_settings.return_value = MagicMock(BASE_URL="http://localhost")
-        response = client.post("/urls/", json={"original_url": "http://example.com/example"})
-        url = db_session.query(URL).filter(URL.original_url == "http://example.com/example").first()
+        BASE_URL= "http://localhost:8000"
+        mock_get_settings.return_value = MagicMock(BASE_URL="http://localhost:8000")
+        response = client.post("/urls/", json={"original_url": "http://example.com/examplexddaex"})
+        url = db_session.query(URL).filter(URL.original_url == "http://example.com/examplexddaex").first()
         assert response.status_code == 201
+        print(url)
         data = response.json()
         short_url = data["short_url"]
-        assert short_url == f"http://localhost/{url.short_url}/"
+        print(short_url)
+        assert short_url == f"{BASE_URL}/{url.short_url}/"
 
-    @patch("app.shortener.service.get_settings")
+    @patch("app.core.config.get_settings")
     def test_redirect_url(self, mock_get_settings, client):
-        original_url = "https://github.com/zhanymkanov/fastapi-best-practices"
-        mock_get_settings.return_value = MagicMock(BASE_URL="http://localhost")
+        BASE_URL = "http://localhost:8000"
+        original_url = "https://github.com/zhanymkanov/fastapi-best-practicesss"
+        mock_get_settings.return_value = MagicMock(BASE_URL=BASE_URL)
         response = client.post("/urls/", json={"original_url": original_url})
         data = response.json()
         assert response.status_code == 201
         short_url = data["short_url"].split("/")[-2]
         response_get = client.get(f"/{short_url}/")
         assert response_get.url == original_url
-
-
-
-
-
 
 
 if __name__ == "__main__":
