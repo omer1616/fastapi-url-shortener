@@ -39,7 +39,7 @@ class TestUrlService:
 
         result = url_service.get_redirect_url(db, short_url="abcde")
 
-        assert result == {'original_url': "https://example.com"}
+        assert result ==  "https://example.com"
         db.query().filter().first.assert_called_once()
 
 
