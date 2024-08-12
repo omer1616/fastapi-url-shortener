@@ -13,14 +13,14 @@ URL Shortener is a web application that allows users to shorten long URLs and re
 
 ## Requirements
 
-- Python 3.8+
+- Python
 - FastAPI
 - Uvicorn
 - SQLAlchemy
 - Redis
 - Pydantic
-- Databases
-- HTTP client (e.g., httpx or requests)
+
+
 
 ## Installation
 
